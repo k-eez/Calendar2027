@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2027 탁상달력 신청 · 약산초</title>
+<meta name="description" content="약산초 교육가족을 위한 2027 인디스쿨 탁상달력, 선착순으로 신청받습니다.">
+<!-- 링크 미리보기(카카오톡·밴드 등) — 사이트 주소가 정해지면 아래 두 곳의 주소를 바꿔 주세요 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="2027 인디스쿨 탁상달력 신청">
+<meta property="og:description" content="약산초 교육가족 선착순 신청 · 소속과 성함만 쓰면 끝!">
+<meta property="og:image" content="https://k-eez.github.io/calendar2027/thumbnail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://k-eez.github.io/calendar2027/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1f2a44">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='12' width='52' height='46' rx='8' fill='%23fffdf8' stroke='%231f2a44' stroke-width='4'/%3E%3Crect x='6' y='12' width='52' height='14' rx='6' fill='%23d6402b'/%3E%3Ctext x='32' y='51' font-size='22' font-family='Arial' font-weight='700' text-anchor='middle' fill='%231f2a44'%3E27%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 한 장짜리 탁상달력 카드(스프링 고리 + 큰 연도) 안에 신청서가 들어간 단일 컬럼 */
+:root {
+  --paper: #fffdf8;      /* 달력 종이 */
+  --desk: #ece6dc;       /* 책상 배경 */
+  --ink: #1f2a44;        /* 남색 잉크 */
+  --muted: #5d6478;
+  --line: #ddd5c8;
+  --sunday: #d6402b;     /* 달력의 일요일 빨강 */
+  --saturday: #2f5fb3;   /* 토요일 파랑 */
+  --ok: #1d7a4f;
+  --ok-bg: #e5f3ea;
+  --ring: #9aa1b0;
+  --display: "Black Han Sans", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #fbf8f1; --desk: #151b2b; --ink: #1f2a44; --muted: #5d6478;
+    --line: #ddd5c8; --ring: #c3c8d4;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100vh;
+  background: var(--desk);
+  color: var(--ink);
+  font: 16px/1.6 var(--body);
+  padding: max(28px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 48px max(16px, env(safe-area-inset-left));
+  display: flex; flex-direction: column; align-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+.demo {
+  max-width: 520px; width: 100%; margin-bottom: 14px;
+  background: #fff3c4; color: #5b4500; border: 1px dashed #c9a227;
+  border-radius: 10px; padding: 8px 12px; font-size: 13px;
+}
+.calendar { width: 100%; max-width: 520px; position: relative; padding-top: 18px; }
+.rings {
+  position: absolute; top: 0; left: 0; right: 0; height: 36px;
+  display: flex; justify-content: space-between; padding: 0 34px; z-index: 2; pointer-events: none;
+}
+.rings span {
+  width: 10px; height: 34px; border-radius: 6px;
+  background: linear-gradient(90deg, #6f7687, var(--ring) 45%, #ffffff 60%, #8a90a0);
+  box-shadow: 0 2px 2px rgba(0,0,0,.25);
+}
+.sheet {
+  background: var(--paper); border-radius: 18px;
+  box-shadow: 0 1px 0 #fff inset, 0 18px 40px -18px rgba(31,42,68,.45), 0 2px 6px rgba(31,42,68,.12);
+  overflow: hidden;
+}
+.head {
+  background: var(--ink); color: #fff;
+  padding: 34px 26px 22px; position: relative;
+}
+.head .holes {
+  position: absolute; top: 10px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 33px;
+}
+.head .holes i { width: 12px; height: 12px; border-radius: 50%; background: var(--desk); display: block; }
+.eyebrow { font-size: 13px; letter-spacing: .12em; opacity: .8; margin: 0 0 4px; }
+.year {
+  font-family: var(--display); font-size: clamp(76px, 22vw, 116px); line-height: .9; margin: 0;
+  letter-spacing: -.02em; display: flex; align-items: baseline; gap: 10px;
+}
+.year small { font-size: 18px; letter-spacing: .02em; font-family: var(--body); font-weight: 700; opacity: .9; }
+h1 { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.25; margin: 12px 0 0; text-wrap: balance; }
+.week {
+  display: grid; grid-template-columns: repeat(7, 1fr); text-align: center;
+  font: 600 12px var(--mono); color: var(--muted); border-bottom: 1px solid var(--line);
+  padding: 10px 18px;
+}
+.week span:first-child { color: var(--sunday); }
+.week span:last-child { color: var(--saturday); }
+.body { padding: 22px 26px 28px; display: grid; gap: 20px; }
+.status {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  padding: 12px 14px; border-radius: 12px; background: #f4efe6; font-size: 14px;
+}
+.chip {
+  font-weight: 700; font-size: 13px; padding: 3px 10px; border-radius: 999px;
+  background: var(--muted); color: #fff; white-space: nowrap;
+}
+.status[data-state="open"] .chip { background: var(--ok); }
+.status[data-state="before"] .chip { background: var(--saturday); }
+.status[data-state="closed"] .chip { background: var(--sunday); }
+.status .when { min-width: 0; flex: 1; }
+.status .count { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+form { display: grid; gap: 16px; }
+label { font-weight: 700; font-size: 14px; display: block; margin-bottom: 6px; }
+select, input[type=text] {
+  width: 100%; font: inherit; font-size: 17px; color: var(--ink);
+  padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff;
+  appearance: none; -webkit-appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231f2a44' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+}
+select:focus, input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(31,42,68,.15); }
+button {
+  font: inherit; font-weight: 700; font-size: 18px; color: #fff; background: var(--sunday);
+  border: 0; border-radius: 14px; padding: 15px; cursor: pointer;
+  box-shadow: 0 4px 0 #a02e1d; transition: transform .08s, box-shadow .08s;
+}
+button:active { transform: translateY(3px); box-shadow: 0 1px 0 #a02e1d; }
+button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+button:disabled { background: #b7b2aa; box-shadow: 0 4px 0 #8f8a83; cursor: not-allowed; }
+.err { color: var(--sunday); font-weight: 700; font-size: 14px; margin: -4px 0 0; min-height: 1em; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.note li { margin: 2px 0; }
+.note ul { margin: 0; padding-left: 18px; }
+
+/* 결과: 번호표 */
+.ticket {
+  border: 2px dashed var(--ink); border-radius: 16px; padding: 22px 18px; text-align: center;
+  background: repeating-linear-gradient(0deg, transparent 0 27px, rgba(31,42,68,.05) 27px 28px);
+  animation: pop .45s cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes pop { from { transform: scale(.92); opacity: .4; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ticket { animation: none; } }
+.ticket .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 12px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); }
+.ticket .tag.again { background: #e8eefb; color: var(--saturday); }
+.ticket .no { font-family: var(--display); font-size: 92px; line-height: 1; margin: 12px 0 2px; color: var(--sunday); font-variant-numeric: tabular-nums; }
+.ticket .no small { font-family: var(--body); font-size: 22px; font-weight: 700; color: var(--ink); margin-left: 4px; }
+.ticket .who { font-size: 17px; font-weight: 700; margin: 0; }
+.ticket p { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+footer { margin-top: 18px; font-size: 12px; color: var(--muted); text-align: center; }
+@media (prefers-color-scheme: dark) { footer { color: #a8afc2; } }
+</style>
+</head>
+<body>
+<div class="demo" id="demo" hidden>미리보기 모드입니다. 실제 신청은 저장되지 않아요. (index.html의 <code>API_URL</code>을 설정하면 실제로 동작합니다)</div>
+
+<main class="calendar">
+  <div class="rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="sheet">
+    <header class="head">
+      <div class="holes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="eyebrow">약산초 교육가족을 위한</p>
+      <p class="year">2027 <small>DESK CALENDAR</small></p>
+      <h1>인디스쿨 탁상달력 신청</h1>
+    </header>
+    <div class="week" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+
+    <div class="body">
+      <div class="status" id="status" data-state="loading">
+        <span class="chip" id="chip">확인 중</span>
+        <span class="when" id="when">신청 가능 시간을 불러오는 중입니다…</span>
+      </div>
+
+      <section id="formWrap">
+        <form id="form" novalidate>
+          <div>
+            <label for="grade">소속(학년)</label>
+            <select id="grade" required>
+              <option value="">선택해 주세요</option>
+              <option>1학년</option><option>2학년</option><option>3학년</option>
+              <option>4학년</option><option>5학년</option><option>6학년</option>
+              <option>특수학급</option><option>특별실</option>
+            </select>
+          </div>
+          <div>
+            <label for="name">성함</label>
+            <input type="text" id="name" maxlength="20" autocomplete="name" placeholder="예) 김약산" required>
+          </div>
+          <p class="err" id="err" role="alert"></p>
+          <button type="submit" id="submit" disabled>신청하기</button>
+        </form>
+      </section>
+
+      <section id="result" hidden aria-live="polite"></section>
+
+      <div class="note">
+        <ul>
+          <li>선착순으로 접수하며, 받아오는 수량이 정해지면 순번대로 최대한 많이 드릴게요.</li>
+          <li>한 기기에서는 한 분만 신청할 수 있어요.</li>
+          <li>같은 소속·성함으로 다시 제출하면 내 신청 순번을 다시 볼 수 있어요.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer>약산초등학교 · 2027 인디스쿨 탁상달력 공동 신청</footer>
+</main>
+
+<script>
+/* ▼▼ Apps Script 웹 앱 배포 후 나온 주소(…/exec)를 여기에 붙여넣으세요 ▼▼ */
+const API_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+/* ▲▲ ------------------------------------------------------------------ ▲▲ */
+
+const DEMO = !/^https:\/\/script\.google\.com\//.test(API_URL);
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const KEY_DEVICE = 'yaksan2027.device', KEY_MINE = 'yaksan2027.mine';
+
+let deviceId = store.get(KEY_DEVICE);
+if (!deviceId) {
+  deviceId = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  store.set(KEY_DEVICE, deviceId);
+}
+
+/* ---------- 미리보기용 가짜 서버 ---------- */
+const demoApi = {
+  win() {
+    const now = new Date();
+    return { state: 'open', openAt: new Date(now - 36e5).toISOString(), closeAt: new Date(+now + 3 * 864e5).toISOString(), now: now.toISOString() };
+  },
+  apply({ grade, name, deviceId }) {
+    const list = store.get('yaksan2027.demoList') || [
+      { g: '3학년', n: '예시선생님', d: 'x1' }, { g: '특별실', n: '예시선생님', d: 'x2' },
+      { g: '5학년', n: '예시선생님', d: 'x3' }, { g: '1학년', n: '예시선생님', d: 'x4' },
+      { g: '특수학급', n: '예시선생님', d: 'x5' }, { g: '6학년', n: '예시선생님', d: 'x6' }
+    ];
+    const i = list.findIndex(r => r.g === grade && r.n === name);
+    if (i >= 0) return { ok: true, already: true, rank: i + 1, grade, name };
+    if (list.some(r => r.d === deviceId)) return { ok: false, code: 'device_used', message: '이 기기에서는 이미 다른 선생님의 신청이 접수되었습니다. 다른 기기에서 신청해 주세요.' };
+    list.push({ g: grade, n: name, d: deviceId });
+    store.set('yaksan2027.demoList', list);
+    return { ok: true, already: false, rank: list.length, grade, name };
+  }
+};
+
+async function getWindow() {
+  if (DEMO) return demoApi.win();
+  const r = await fetch(API_URL, { method: 'GET' });
+  return r.json();
+}
+async function postApply(payload) {
+  if (DEMO) { await new Promise(r => setTimeout(r, 500)); return demoApi.apply(payload); }
+  const r = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // CORS 사전요청 없이 보내기
+    body: JSON.stringify({ action: 'apply', ...payload })
+  });
+  return r.json();
+}
+
+/* ---------- 시간 표시 ---------- */
+const fmt = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const days = '일월화수목금토';
+  const h = d.getHours(), m = d.getMinutes();
+  return `${d.getMonth() + 1}월 ${d.getDate()}일(${days[d.getDay()]}) ${h < 12 ? '오전' : '오후'} ${h % 12 || 12}시${m ? ' ' + m + '분' : ''}`;
+};
+let win = null, skew = 0, timer = null;
+
+function renderStatus() {
+  if (!win) return;
+  const now = Date.now() + skew;
+  let state = 'open';
+  if (win.openAt && now < Date.parse(win.openAt)) state = 'before';
+  else if (win.closeAt && now > Date.parse(win.closeAt)) state = 'closed';
+
+  $('status').dataset.state = state;
+  const sub = $('submit');
+  if (state === 'before') {
+    const left = Math.max(0, Date.parse(win.openAt) - now);
+    const d = Math.floor(left / 864e5), h = Math.floor(left / 36e5) % 24, m = Math.floor(left / 6e4) % 60, s = Math.floor(left / 1e3) % 60;
+    const pad = (n) => String(n).padStart(2, '0');
+    $('chip').textContent = '신청 전';
+    $('when').innerHTML = `<b>${fmt(win.openAt)}</b>부터 신청할 수 있어요<br><span class="count">${d ? d + '일 ' : ''}${pad(h)}:${pad(m)}:${pad(s)}</span> 남음`;
+    sub.disabled = true; sub.textContent = '신청 시작 전이에요';
+  } else if (state === 'closed') {
+    $('chip').textContent = '마감';
+    $('when').innerHTML = `${fmt(win.closeAt)}에 신청이 마감되었습니다.<br>이미 신청하셨다면 같은 소속·성함으로 순번을 확인할 수 있어요.`;
+    sub.disabled = false; sub.textContent = '내 순번 확인하기';
+  } else {
+    $('chip').textContent = '신청 중';
+    $('when').innerHTML = win.closeAt ? `<b>${fmt(win.closeAt)}</b>까지 선착순 접수` : '선착순 접수 중';
+    sub.disabled = false; sub.textContent = '신청하기';
+  }
+}
+
+async function loadWindow() {
+  try {
+    win = await getWindow();
+    if (win.now) skew = Date.parse(win.now) - Date.now();
+    renderStatus();
+    clearInterval(timer);
+    timer = setInterval(renderStatus, 1000);
+  } catch (e) {
+    $('chip').textContent = '연결 오류';
+    $('when').textContent = '신청 정보를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.';
+  }
+}
+
+/* ---------- 결과 번호표 ---------- */
+function showTicket(res) {
+  const again = !!res.already;
+  $('result').innerHTML = `
+    <div class="ticket">
+      <span class="tag ${again ? 'again' : ''}">${again ? '이미 신청하셨어요' : '신청 완료'}</span>
+      <div class="no">${res.rank}<small>번째</small></div>
+      <p class="who"></p>
+      <p>${again ? '처음 신청하신 순번 그대로 유지됩니다.' : '선착순 순번이 기록되었어요. 수량이 정해지면 안내드릴게요!'}</p>
+    </div>`;
+  $('result').querySelector('.who').textContent = `${res.grade} ${res.name} 선생님`;
+  $('result').hidden = false;
+  $('formWrap').hidden = true;
+}
+
+/* ---------- 제출 ---------- */
+$('form').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const grade = $('grade').value;
+  const name = $('name').value.replace(/\s+/g, '');
+  $('err').textContent = '';
+  if (!grade) { $('err').textContent = '소속(학년)을 선택해 주세요.'; $('grade').focus(); return; }
+  if (name.length < 2) { $('err').textContent = '성함을 두 글자 이상 입력해 주세요.'; $('name').focus(); return; }
+
+  // 한 기기 한 명: 이 기기로 다른 분이 이미 신청했다면 막기
+  const mine = store.get(KEY_MINE);
+  if (mine && (mine.grade !== grade || mine.name !== name)) {
+    $('err').textContent = '이 기기에서는 이미 다른 선생님의 신청이 접수되었습니다. 본인 기기에서 신청해 주세요.';
+    return;
+  }
+
+  const btn = $('submit'), label = btn.textContent;
+  btn.disabled = true; btn.textContent = '접수 중…';
+  try {
+    const res = await postApply({ grade, name, deviceId });
+    if (res.ok) {
+      store.set(KEY_MINE, { grade: res.grade, name: res.name, rank: res.rank });
+      showTicket(res);
+    } else {
+      $('err').textContent = res.message || '신청하지 못했어요. 다시 시도해 주세요.';
+      if (res.code === 'before' || res.code === 'closed') loadWindow();
+    }
+  } catch (e) {
+    $('err').textContent = '서버에 연결하지 못했어요. 잠시 후 다시 눌러 주세요.';
+  } finally {
+    btn.textContent = label; renderStatus();
+  }
+});
+
+/* 이 기기로 이미 신청했다면 이름을 채워 두기 */
+(function prefill() {
+  const mine = store.get(KEY_MINE);
+  if (mine) { $('grade').value = mine.grade; $('name').value = mine.name; }
+})();
+
+if (DEMO) $('demo').hidden = false;
+loadWindow();
+</script>
+</body>
+</html>
